@@ -2,7 +2,7 @@
 
 Este projeto foi desenvolvido para usar como a técnica de Pomodoro, onde o usuario pode adicionar um nome ao seu projeto e colocar e controlar o tempo gasto na construção do mesmo.
 
-<img src="./timer/src/assets/projeto-timer.png">
+<img src="./src/assets/projeto-timer.png">
 
 ## Características
 
