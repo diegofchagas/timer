@@ -16,6 +16,7 @@ body{
   /* font-family: "Roboto Mono", monospace; */
   background-color: ${({theme})=> theme["gray-900"]};
   color: ${({theme})=> theme["gray-300"]};
+  -webkit-font-smoothing: antialiased;
 }
 
 body,input, textarea,button{
