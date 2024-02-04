@@ -7,10 +7,10 @@ export const GlobalStyle = createGlobalStyle`
   box-sizing:border-box;
 }
 
-:focus{
+/* :focus{
   outline:0;
   box-shadow: 0 0 0 2px ${({theme})=> theme["green-500"]};
-}
+} */
 
 body{
   /* font-family: "Roboto Mono", monospace; */
