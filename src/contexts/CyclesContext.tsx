@@ -64,9 +64,6 @@ export function CyclesContextProvider({ children }: CylesContextProviderProps) {
     setCycles((state) => [...state, newCycle]);
     setActiveCycleId(newCycle.id);
     setAmountSecondsPassed(0);
-
-    //Esse reset restarta meus dados para o valor default dos inputs.
-    //reset();
   };
 
   const interruptCurrentCycle = () => {

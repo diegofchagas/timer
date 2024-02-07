@@ -31,16 +31,21 @@ export const Home = () => {
     },
   });
 
-  const { handleSubmit, watch, } = newCycleForm
+  const { handleSubmit, watch,reset } = newCycleForm
 
+  const handleCreateNewCycle = (data: NewCycleFormData)=>{
+    createNewCicle(data)
 
+    //Esse reset restarta meus dados para o valor default dos inputs.
+    reset()
+  }
 
   const task = watch("task");
   const isSubmitDisabled = !task;
 
   return (
     <HomeContainer>
-      <form onSubmit={handleSubmit(createNewCicle)} action="">
+      <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
         <FormProvider {...newCycleForm}>
           <NewCycleForm />
         </FormProvider>
