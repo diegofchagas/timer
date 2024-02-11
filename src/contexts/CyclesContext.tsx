@@ -1,17 +1,21 @@
-import { ReactNode, createContext, useReducer, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useState,
+  useReducer,
+  useEffect,
+} from "react";
+import { Cycle, cyclesReducer } from "../reducers/cycles/reducer";
+import {
+  addNewCycleAction,
+  interruptCurrentCycleAction,
+  markCurrentCyclesAsFinishedAction,
+} from "../reducers/cycles/actions";
+import { differenceInSeconds } from "date-fns";
 
 interface CreateCycleData {
   task: string;
   minutesAmount: number;
-}
-
-interface Cycle {
-  id: string;
-  task: string;
-  minutesAmount: number;
-  startDate: Date;
-  interruptedDate?: Date;
-  finishedDate?: Date;
 }
 
 interface CyclesContextType {
@@ -31,72 +35,48 @@ interface CylesContextProviderProps {
   children: ReactNode;
 }
 
-interface CyclesState {
-  cycles: Cycle[];
-  activeCycleId: string | null;
-}
-
 export function CyclesContextProvider({ children }: CylesContextProviderProps) {
   const [cyclesState, dispatch] = useReducer(
-    (state: CyclesState, action: any) => {
-    
-      switch (action.type) {
-        case "ADD_NEW_CYCLE":
-          return {
-            ...state,
-            cycles: [...state.cycles, action.payload.newCycle],
-            activeCycleId: action.paylod.newCycle.id,
-          };
-        case "INTERRUPT_CURRENT_CYCLE":
-          return {
-            ...state,
-            cycles: state.cycles.map((cycle) => {
-              if (cycle.id === state.activeCycleId) {
-                return { ...cycle, interruptedDate: new Date() };
-              } else {
-                return cycle;
-              }
-            }),
-            activeCycleId: null,
-          };
-        case "MARK_CURRENT_CYCLE_AS_FINISHED":
-          return {
-            ...state,
-            cycles: state.cycles.map((cycle) => {
-              if (cycle.id === state.activeCycleId) {
-                return { ...cycle, finishedDate: new Date() };
-              } else {
-                return cycle;
-              }
-            }),
-            activeCycleId: null,
-          };
-
-        default:
-          return state;
-      }
-    },
+    cyclesReducer,
     {
       cycles: [],
       activeCycleId: null,
+    },
+    (initialState) => {
+      const storedStateJSON = localStorage.getItem("@timer-cycles-state");
+
+      if (storedStateJSON) {
+        JSON.parse(storedStateJSON);
+      }
+
+      return initialState
     }
   );
-  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
 
   const { cycles, activeCycleId } = cyclesState;
   const activeTaskId = cycles.find((task) => task.id === activeCycleId);
+
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(() => {
+    // nesse caso eu observo se tem um task ativa se tiver eu vejo a diferenca entre as duas , conseguindo recuperar o tempo da mesma caso eu precise autalizar a pagina , como estou salvando no localStorage foi necessario fazer essa conversao direto no useState. Retornando assim a diferença em segundos da data atual da data que o projeto foi inicializado
+
+    if (activeTaskId) {
+      return differenceInSeconds(new Date(), new Date(activeTaskId.startDate));
+    }
+    return 0;
+  });
+
+  useEffect(() => {
+    const stateJSON = JSON.stringify(cyclesState);
+    localStorage.setItem("@timer-cycles-state", stateJSON);
+    // localStorage.clear();
+  }, [cyclesState]);
 
   const setSecondsPassed = (seconds: number) => {
     setAmountSecondsPassed(seconds);
   };
 
   const markCurrentCycleAsFinished = () => {
-    dispatch({
-      type: "MARK_CURRENT_CYCLE_AS_FINISHED",
-      payload: {
-        activeCycleId,
-      },
-    });
+    dispatch(markCurrentCyclesAsFinishedAction());
     // setCycles((state) =>
     //   state.map((cycle) => {
     //     if (cycle.id === activeCycleId) {
@@ -116,22 +96,12 @@ export function CyclesContextProvider({ children }: CylesContextProviderProps) {
       startDate: new Date(),
     };
     //setCycles((state) => [...state, newCycle]);
-    dispatch({
-      type: "ADD_NEW_CYCLE",
-      payload: {
-        newCycle,
-      },
-    });
+    dispatch(addNewCycleAction(newCycle));
     setAmountSecondsPassed(0);
   };
 
   const interruptCurrentCycle = () => {
-    dispatch({
-      type: "INTERRUPT_CURRENT_CYCLE",
-      payload: {
-        activeCycleId,
-      },
-    });
+    dispatch(interruptCurrentCycleAction());
     // setCycles((state) =>
     //   state.map((cycle) => {
     //     if (cycle.id === activeCycleId) {
@@ -141,6 +111,7 @@ export function CyclesContextProvider({ children }: CylesContextProviderProps) {
     //     }
     //   })
     // );
+    console.log("chamou");
   };
 
   return (
