@@ -16,7 +16,7 @@ export const CountDown = () => {
       interval = setInterval(() => {
         const secondsDifference = differenceInSeconds(
           new Date(),
-          activeTaskId.startDate
+          new Date(activeTaskId.startDate)
         );
 
         if (secondsDifference >= totalSeconds) {
