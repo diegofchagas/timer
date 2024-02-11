@@ -1,4 +1,4 @@
- ## 💻  Tweet Lite
+ ## 💻  Timer
 
 ### 🔥 Introdução
 
